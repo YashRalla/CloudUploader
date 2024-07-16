@@ -1,0 +1,27 @@
+#! /usr/bin/bash
+
+echo "Logging in"
+az login --use-device-code
+
+echo "Would you like to see account details? Type [y/n] for yes/no"
+
+# case statement here...
+
+echo "To upload a file to Azure server, a resource group, a storage account in that resource group and a container within that storage account are needed."
+echo "Please enter a name for your desired resource group"
+
+read rg_name
+
+echo "Please enter the name of the region where this resource group is located"
+
+read rg_loc
+
+echo "Please enter a name for your desired storage account"
+
+read sa_name
+
+echo "Please enter a name for your container"
+
+read con
+
+

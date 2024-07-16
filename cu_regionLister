@@ -1,0 +1,9 @@
+#! /usr/bin/bash
+
+if ls -d /usr/bin/az >/dev/null 2>&1; then
+	echo "Fetching regions, please wait..."
+	az account list-locations --query '[].name'
+	echo "Choose a region from above (Preferably one close to you) and note its name, make sure it matches exactly when using with main script"
+else
+	echo "Azure CLI not found, please run setup script to install"
+fi

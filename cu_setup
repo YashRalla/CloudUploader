@@ -1,0 +1,13 @@
+#! /usr/bin/bash
+
+# This function checks if Azure CLI is installed on the user's machine, and installs it if not. Following that, it logs in.
+
+if [ ! ls -d /usr/bin/az >/dev/null 2>&1 ]; then
+	echo "Installing AZURE CLI"
+	curl -sL https://aka.ms/InstallAzureCLIDeb | sudo bash
+else
+	echo "Azure CLI found, skipping installation"
+fi
+
+echo "Logging in... Recommended to browse the list of available regions using the regionLister script"
+az login --use-device-code
