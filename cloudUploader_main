@@ -1,27 +1,68 @@
 #! /usr/bin/bash
 
-echo "Logging in"
-az login --use-device-code
+echo "Logging in - Press '1' for direct browser login (May need to ctrl+click on given link) or '2' for device code login (more compatible)"
 
-echo "Would you like to see account details? Type [y/n] for yes/no"
+login() {
+	az login
+	finished=1
+}
 
-# case statement here...
+login_code() {
+	az login --use-device-code
+	finished=1
+}
+
+finished=0
+while [ $finished -ne 1 ]
+do
+read login_choice;
+case $login_choice in
+	1) login;;
+	2) login_code;;
+	*) echo "Please enter a valid choice"
+esac
+done
+
+echo "Please enter the Subscription ID of the desired subscription as seen above (You may copy and paste it)"
+
+read subID;
+
+echo "Your subscription ID is $subID"
 
 echo "To upload a file to Azure server, a resource group, a storage account in that resource group and a container within that storage account are needed."
-echo "Please enter a name for your desired resource group"
 
-read rg_name
+echo "Please enter the name of storage account"
 
-echo "Please enter the name of the region where this resource group is located"
+read sa_name;
 
-read rg_loc
-
-echo "Please enter a name for your desired storage account"
-
-read sa_name
+echo "Your storage account's name is $sa_name"
 
 echo "Please enter a name for your container"
 
-read con
+read con;
 
+echo "Your storage account's name is $con"
 
+echo "Please enter the name of the file you wish to upload [Make sure it is in the current directory!]"
+
+# Case statement - create, upload or download? The below commands are for create
+
+echo "Please enter a name for your desired resource group"
+
+read rg_name;
+
+echo "Your resource group name is $rg_name"
+
+echo "Please enter the name of the region where this resource group is located"
+
+read rg_loc;
+
+echo "Your resource group's location is $rg_loc"
+
+# below is for upload
+
+read file;
+
+echo "The file you selected is $file"
+
+# Need to check how to check for all files in storage account across multiple containers
