@@ -1,5 +1,12 @@
 #! /usr/bin/bash
 
+if ls -d /usr/bin/az >/dev/null 2>&1; then
+	echo "Azure CLI found, beginning CloudUploader Program..."
+else
+	echo "Azure CLI not found, please run setup script to install"
+	exit
+fi
+
 echo "Logging in - Press '1' for direct browser login (May need to ctrl+click on given link) or '2' for device code login (more compatible)"
 
 login() {
