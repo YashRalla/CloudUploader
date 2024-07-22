@@ -51,65 +51,74 @@ read con;
 
 echo "Your storage account's name is $con"
 
-echo "Please enter the name of the file you wish to upload [Make sure it is in the current directory!]"
-
 # Case statement - create, upload or download? The below commands are for create
-
-echo "Would you like to create a storage account, upload or download a file? Enter [c/u/d] for the corresponding options, or enter 'Exit' to quit."
 
 finished1=0
 
 create() {
 	
 	echo "Please enter a name for your desired resource group"
-
 	read rg_name;
 
 	echo "Your resource group name is $rg_name"
 
 	echo "Please enter the name of the region where this resource group is located"
-
 	read rg_loc;
 
 	echo "Your resource group's location is $rg_loc"
 	az group create --name $rg_name --location $rg_loc
+	
 	az group list
+	
 	az storage account create --name $sa_name --resource-group $rg_name --location $rg_loc --encryption-services blob
 	az provider register -n 'Microsoft.Storage'
+	
 	az ad signed-in-user show --query id -o tsv | az role assignment create --role "Storage Blob Data Contributor" --assignee @- --scope --"/subscriptions/$subID/resourceGroups/$rg_name/providers/Microsoft.Storage/storageAccounts/$sa_name"
+	
 	az storage container create --account-name $sa_name --name $con --auth-mode login
 }
 
 upload() {
+	echo "Note that this primitive version WILL overwrite any file you already have in cloud storage under the same name, so do be careful. Listing the files present for your convenience."
+	
+	az storage blob list --account-name $sa_name --container-name $con --output table --auth-mode login
+	
 	echo "Enter the name of the file you wish to upload, with extension if it has one. Ensure it is in same directory"
-	read file_name;
-	if [ -f $file_name ]; then
-		echo "$file_name found"
-		az storage blob upload --account-name $sa_name --container-name $con --name $file_name --file $file_name
-		echo "File List"
-		az storage blob list --account-name $sa_name --container-name $con --output table --auth-mode login
+	read file_name_u;
+	if [ -f $file_name_u ]; then
+		echo "$file_name_u found"
+		
+		az storage blob upload --account-name $sa_name --container-name $con --name $file_name_u --file $file_name_u --overwrite
 
 	else
-		echo "$file_name not found"
+		echo "$file_name_u not found"
 	fi
 }
 
 download() {
+	echo "Fetching file list..."
+	
+	az storage blob list --account-name $sa_name --container-name $con --output table --auth-mode login
+	
+	echo "Enter the name of the file from the above that you wish to download, type it exactly, with extensions"
+	read file_name_d;
+	echo "Type the directory where the file is to be saved"
+	read dir_file;
+	echo "Now type the name that you want to assign to the file once it's been downloaded"
+	read file_rename;
 
+	az storage blob download --account-name $sa_name --container-name $con --name $file_name_d --file $dir_file/$file_rename --auth-mode login
 }
 
 while [ $finished1 -ne 1 ]
 do
+	echo "Would you like to create a storage account, upload or download a file? Enter [c/u/d] for the corresponding options, or enter 'Exit' to quit."
 	read cud;
 	case $cud in
 		"c"|"C") create;;
 		"u"|"U") upload;;
 		"d"|"D") download;;
-		"exit"|"Exit"|"EXIT") exit;;
-		*) echo "Not a valid option, please select from (C)reate a storage a/c, (U)pload or (D)ownload a file"
+		"exit"|"exiT"|"exIt"|"exIT"|"eXit"|"eXiT"|"eXIt"|"eXIT"|"Exit"|"ExiT"|"ExIt"|"ExIT"|"EXit"|"EXiT"|"EXIt"|"EXIT") exit;;
+		*) echo "Not a valid option, please select from (C)reate a storage a/c, (U)pload or (D)ownload a file to exit the script"
 	esac
 done
-
-# below is for upload
-
-# Need to check how to check for all files in storage account across multiple containers
